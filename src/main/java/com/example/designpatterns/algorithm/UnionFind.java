@@ -1,49 +1,39 @@
 package com.example.designpatterns.algorithm;
 
-import java.util.Arrays;
-
 public class UnionFind {
-    private int[] value;
+    int[] parent;
+    int[] rank;
 
-    private int[] size;
-    public UnionFind(int number){
-        this.size = new int[number];
-        this.value = new int[number];
-        for (int i = 0; i < number; i++){
-            this.value[i] = i;
-            this.size[i] = 1;
+    public UnionFind(int n) {
+        parent = new int[n];
+        rank = new int[n];
+        for (int i = 0; i < n; i++) {
+            parent[i] = i;
+            rank[i] = 1;
         }
     }
 
-    private int root(int p){
-        int i = p;
-        while (this.value[i] != i){
-            this.value[i] = this.value[this.value[i]];
-            i = this.value[i];
+    public int find(int p) {
+        if (p != parent[p]) {
+            parent[p] = find(parent[p]);
         }
-        return i;
+        return parent[p];
     }
-    public void union(int p, int q){
-        System.out.printf("Union %d -> %d: ", p, q);
-        int r1 = root(p);
-        int r2 = root(q);
+
+    public void union(int p, int q) {
+        int r1 = find(p);
+        int r2 = find(q);
         if (r1 == r2) return;
-        if (size[p] >= size[q]){
-            this.value[r2] = r1;
-            this.size[r1] += size[q];
+        if (rank[r1] < rank[r2]) {
+            parent[r1] = r2;
+            rank[r2] += rank[r1];
         } else {
-            this.value[r1] = r2;
-            this.size[r2] += size[p];
+            parent[r2] = r1;
+            rank[r1] += rank[r2];
         }
-
-        System.out.println("New array: " + printUnion());
     }
 
-    public boolean connected(int p, int q){
-        return root(p) == root(q);
-    }
-
-    public String printUnion(){
-        return Arrays.toString(this.value);
+    public boolean connected(int p, int q) {
+        return find(p) == find(q);
     }
 }
